@@ -1,0 +1,9 @@
+*~
+.savehist.el
+
+.svn/
+
+# Eclipse generated files
+*/.settings/
+*/Debug
+*/Release
