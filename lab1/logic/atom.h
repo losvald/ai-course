@@ -31,19 +31,25 @@ public:
 	static const Atom<T> FALSE;
 
 	Atom(const T& id) : id_(id) { }
+
 	const T& id() const { return id_; }
+
 	bool isTautology() const {
 		return id_ == Atom::TRUE.id_;
 	}
+
 	bool isContradiction() const {
 		return id_ == Atom::FALSE.id_;
 	}
+
 	friend bool operator==(const Atom& a, const Atom& b) {
 		return a.id_ == b.id_;
 	}
+
 	friend bool operator<(const Atom& a, const Atom& b) {
 		return a.id_ < b.id_;
 	}
+
 	friend std::ostream& operator<<(std::ostream& os, const Atom& a) {
 		if (a.isTautology())
 			os << '1';

@@ -1,22 +1,24 @@
 /*
- * zad-1_5.cpp
+ * Sveučilište u Zagrebu, Fakultet elektrotehnike i računarstva
+ * Umjetna inteligencija
  *
- *  Created on: Mar 9, 2011
- *      Author: Leo Osvald
+ * Rješavanje sudokua pomoću propozicijske logike
+ *
+ * Copyright: (c) 2011 Leo Osvald <leo.osvald@fer.hr>
+ *
  */
 
 #include <iostream>
-
-#include "base_solver.h"
-#include "test/backtrack_solver.h"
 
 #include "logic/atom.h"
 #include "logic/literal.h"
 #include "logic/clause.h"
 #include "logic/prover.h"
 
+#define VERBOSITY 0
+
 template<typename T, int Rows, int Columns = Rows, T ZERO = T()>
-class PropositionalLogicSudokuSolver : public BaseSolver<T, Rows, Columns, ZERO> {
+class PropositionalLogicSudokuSolver {
 public:
 	typedef std::size_t SizeType;
 	typedef T ValueType;
@@ -119,14 +121,6 @@ public:
 			std::cerr << std::endl;
 		}
 
-		for (SizeType r = 0; r < RC; ++r) {
-					for (SizeType c = 0; c < RC; ++c) {
-						std::cerr << "("<< (table_[r][c] != ZERO) << ")";
-					}
-					std::cerr << std::endl;
-				}
-
-
 		ProverType prover;
 		for (SizeType r = 0; r < RC; ++r)
 			for (SizeType c = 0; c < RC; ++c) {
@@ -146,8 +140,8 @@ public:
 				}
 			}
 
-//		std::cout << "Clauses" << std::endl;
-		std::cout << prover << std::endl;
+		if (VERBOSITY)
+			std::cout << prover << std::endl;
 
 		return prover.prove(createLiteral(row, col, target, false));
 	}
@@ -162,16 +156,20 @@ public:
 		return ZERO;
 	}
 
+	/**
+	 * Solves the whole puzzle by querying each field
+	 */
 	bool solve() {
 		for (SizeType r = 0; r < RC; ++r)
 			for (SizeType c = 0; c < RC; ++c)
 				if (table_[r][c] == ZERO) {
 					if ((table_[r][c] = query(r, c)) == ZERO) {
-						std::cerr << "CANNOTDEDUCE" << std::endl;
-						//return false;
+						if (VERBOSITY)
+							std::cerr << "CANNOT DEDUCE" << std::endl;
 					}
 					else {
-						std::cerr << "COMPUTED" << std::endl;
+						if (VERBOSITY)
+							std::cerr << "DEDUCED" << std::endl;
 					}
 				}
 
@@ -213,18 +211,6 @@ template<> const Literal<MyAtomIdType> Literal<MyAtomIdType>::FALSE(
 using namespace std;
 
 template<typename T, int R, int C>
-istream& operator>>(istream& is, SudokuSolver<T, R, C>& solver) {
-	static const int RC = R * C;
-	for (int r = 0; r < RC; ++r)
-		for (int c = 0; c < RC; ++c) {
-			char ch[2];
-			cin >> ch;
-			solver.set(r, c, (ch[0] == '.' ? 0 : ch[0] - '0'));
-		}
-	return is;
-}
-
-template<typename T, int R, int C>
 istream& operator>>(istream& is, PropositionalLogicSudokuSolver<T, R, C>& solver) {
 	static const int RC = R * C;
 	for (int r = 0; r < RC; ++r)
@@ -237,6 +223,9 @@ istream& operator>>(istream& is, PropositionalLogicSudokuSolver<T, R, C>& solver
 }
 
 void doQueries(const MySudokuSolver& solver) {
+	cout << "Query format: row col value" << endl;
+	cout << "Set values for row or col to a value"
+				<< " out of board to solve the whole puzzle" << endl;
 	while (true) {
 		MySudokuSolver::SizeType r, c;
 		MySudokuSolver::ValueType target_value;
@@ -249,22 +238,16 @@ void doQueries(const MySudokuSolver& solver) {
 	}
 }
 
-void printHelp() {
-}
-
-#if 1
-
 int main(int argc, char** argv) {
 	MySudokuSolver solver;
 	cin >> solver;
 	doQueries(solver);
-	cout << "Solving whole puzzle" << endl;
+	cout << "Solving the whole puzzle" << endl;
 	solver.solve();
 	cout << solver;
+
 	return 0;
 }
-
-#endif
 
 /*
 
@@ -298,8 +281,5 @@ int main(int argc, char** argv) {
 4 3 1 2
 3 4 2 1
 1 2 3 4
-
-1 .
-. 1
 
  */

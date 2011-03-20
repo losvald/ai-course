@@ -26,9 +26,9 @@
 
 namespace logic {
 
-template<class T>
-class ExpressionElement;
-
+/**
+ * Literal is an atom which can be negated
+ */
 template<class T>
 class Literal {
 public:

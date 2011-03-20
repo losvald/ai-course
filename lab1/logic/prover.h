@@ -37,8 +37,8 @@
 
 namespace logic {
 
-
 #define VERBOSITY 0
+#define COMPARE_KB_AND_SOS_ONLY 1
 
 template<class LiteralIdClass>
 class Prover {
@@ -113,10 +113,8 @@ class Prover {
 		template<class Functor>
 		void foreach(const LiteralType& literal, const Functor& f) const {
 			if (clauses_by_literal_.count(literal)) {
-				std::vector<ConstClausePointer> clauses
+				const std::vector<ConstClausePointer>& clauses
 				= clauses_by_literal_.at(literal);
-
-//				std::sort(clauses.begin(), clauses.end());
 
 				FOREACH(it, clauses) {
 					f(**it);
@@ -217,7 +215,6 @@ class Prover {
 
 		const ClauseType& clause_;
 		const KnowledgeBaseType& kb_;
-		KnowledgeBaseType& added_to_sos_;
 		SetOfSupportType& sos_;
 		bool& resolved_;
 
@@ -227,10 +224,9 @@ class Prover {
 
 	public:
 		SosQueueFiller(const ClauseType& clause, const KnowledgeBaseType& kb,
-				KnowledgeBaseType& added_to_sos,
 				SetOfSupportType& sos, bool& resolved)
 		: clause_(clause),
-		  kb_(kb), added_to_sos_(added_to_sos), sos_(sos), resolved_(resolved) { }
+		  kb_(kb), sos_(sos), resolved_(resolved) { }
 
 		void operator()(const ClauseType& clause) const {
 			ClauseType resolvent_clause = clause + clause_;
@@ -242,10 +238,9 @@ class Prover {
 			if (resolvent_clause.isNil()) {
 				resolved_ = true;
 				return ;
-			} else if (!resolvent_clause.isTautology()
-					&& !isSuperset(resolvent_clause)) {// if not tautology
-				if (sos_.add(resolvent_clause)) // push it to the SoS queue
-					added_to_sos_.add(resolvent_clause);
+			} else if (!resolvent_clause.isTautology() // if not tautology
+					&& !isSuperset(resolvent_clause)) { // nor superset
+				sos_.add(resolvent_clause); // push it to the SoS queue
 			}
 		}
 
@@ -254,7 +249,6 @@ class Prover {
 			// pass this because KnowledgeBaseType expects operator()(const ClauseType&)
 			// in foreach method
 			kb_.foreach(literal, *this);
-//			added_to_sos_.foreach(literal, *this);
 		}
 	};
 	typedef SetOfSupport<LiteralIdClass> SetOfSupportType;
@@ -262,14 +256,25 @@ class Prover {
 	KnowledgeBaseType knowledge_base_;
 
 	bool prove0(SetOfSupportType& sos) const {
-		KnowledgeBaseType added_to_sos;
+		/**
+		 * Dummy knowledge base containing clauses popped from SoS
+		 * (this enables easy resolution among two clauses from SoS)
+		 */
+		KnowledgeBaseType popped;
 		bool resolved = false;
 		while (!sos.empty() && !resolved) {
-			std::cerr << sos.size() << std::endl;
+			if (VERBOSITY > 1)
+				std::cerr << sos.size() << std::endl;
 			// extract a clause from set of support
 			ClauseType clause = sos.pop();
 			clause.foreach(SosQueueFiller<LiteralIdClass>(clause,
-					knowledge_base_, added_to_sos, sos, resolved));
+					knowledge_base_, sos, resolved));
+
+			if (!COMPARE_KB_AND_SOS_ONLY) {
+				clause.foreach(SosQueueFiller<LiteralIdClass>(clause,
+						popped, sos, resolved));
+				popped.add(clause);
+			}
 		}
 		return resolved;
 	}
@@ -283,7 +288,7 @@ public:
 
 	bool prove(const LiteralType& literal) const {
 		SetOfSupportType sos;
-		sos.add(ClauseType(!literal));
+		sos.add(ClauseType(!literal)); // add negated clause to SoS
 		return prove0(sos);
 	}
 
