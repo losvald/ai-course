@@ -1,0 +1,14 @@
+( "a" , "b" )
+# P ( "a" , "a" ) 1
+# P ( "a" , "b" ) 0
+# P ( "b" , "a" ) 0
+# P ( "b" , "b" ) 1
+
+? P ( "a" , "b" )
+? P ( "a" , "a" )
+? A x ( A y ( P ( x , y ) | P ( y , x ) ) )
+
+? E x ( A y ( P ( x , y ) ) )
+? E y ( ~ P ( "a" , y ) )
+? A x A y P ( x , y )
+? A x A y ( P ( x , y ) -> P ( y , x ) )

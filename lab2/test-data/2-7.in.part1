@@ -1,0 +1,3 @@
+? A x A y ( P ( x , y ) -> E z Q ( ff ( x ) , z ) )
+? ( Q ( ff ( "a" ) , "a" ) & P ( x , "b" ) )
+? A x E y P ( x , y ) & E y Q ( ff ( x ) , y ) )

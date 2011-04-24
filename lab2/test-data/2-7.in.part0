@@ -1,0 +1,21 @@
++ "a"
++ "b"
+
+# ff ( "c" ) "a"
+
+# P ( "a" , "b" ) true
+# P ( "a" , "c" ) false
+# P ( "b" , "a" ) false
+# P ( "b" , "b" ) false
+# P ( "b" , "c" ) true
+# P ( "c" , "a" ) true
+# P ( "c" , "b" ) false
+# P ( "c" , "c" ) false
+
+# Q ( "a" , "a" ) true
+# Q ( "a" , "c" ) false
+# Q ( "c" , "c" ) true
+# Q ( "b" , "a" ) false
+# Q ( "b" , "b" ) false
+# Q ( "b" , "c" ) false
+# Q ( "c" , "a" ) false
