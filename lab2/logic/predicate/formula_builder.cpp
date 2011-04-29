@@ -20,6 +20,7 @@ namespace logic {
 
 namespace predicate {
 
+// FIXME memory leaks!
 namespace builder {
 
 Formula& operator~(const Formula& f0) {

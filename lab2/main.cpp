@@ -227,10 +227,11 @@ void PrintHelp() {
   cout << "The input expects elements of the following grammar: " << endl;
   cout << "<FORMULA> ::= ~ <FORMULA> | ( <FORMULA> <2> <FORMULA> ) | " <<
       "A <VARIABLE> <FORMULA>" << endl <<  "            | " <<
-      "<PREDICATE> ( <TERM-LIST> ) | <TRUE> | <FALSE>" << endl;
+      "<PREDICATE> \"(\" <TERM-LIST> \")\" | <TRUE> | <FALSE>" << endl;
 
   cout << "<TERM-LIST> ::= <TERM> | <TERM> , <TERM-LIST>" << endl;
-  cout << "<TERM> ::= <CONSTANT> | <VARIABLE> | <FUNCTION> ( <TERM-LIST> )" <<
+  cout << "<TERM> ::= <CONSTANT> | <VARIABLE> | <FUNCTION>"
+      " \"(\" <TERM-LIST> \")\"" <<
       endl;
   cout << "<2> ::= & | \"|\" | -> | > | <- | < | ==" << endl;
   cout << "<VARIABLE> ::= [a-z]" << endl;
@@ -239,6 +240,16 @@ void PrintHelp() {
   cout << "<PREDICATE> ::= [A-Z]+" << endl;
   cout << "<TRUE> ::= 1 | true" << endl;
   cout << "<FALSE> ::= 0 | false" << endl;
+  cout << "Available commands:" << endl;
+  cout << "\"(\" <TERM-LIST> \")\" - defines domain" << endl;
+  cout << "+ <CONSTANT> - adds the specified constant from the domain" << endl;
+  cout << "- <CONSTANT> - removes the specified constant from the domain" << endl;
+  cout << "# <FUNCTION> \"(\" <TERM-LIST> \")\" <CONSTANT>"
+      "\n\t- defines the value of a function named <FUNCTION>" << endl;
+  cout << "# <PREDICATE> \"(\" <TERM-LIST> \")\" (<TRUE> | <FALSE>)"
+      "\n\t- defines the value of a predicate named <PREDICATE>" << endl;
+  cout << "? <FORMULA>" << endl;
+  cout << "(See test-data/ for examples)" << endl;
 }
 
 int main(int argc, char** argv) {

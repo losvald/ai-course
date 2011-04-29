@@ -22,6 +22,8 @@ namespace predicate {
 
 namespace parser {
 
+namespace {
+
 bool IsVariable(const std::string& s) {
   return s.size() == 1 && islower(s[0]);
 }
@@ -73,6 +75,8 @@ Term& ParseTerm(std::istream& is) {
   TermVector function_arguments = ParseTermVector(is);
   return *Function(s)(function_arguments).Clone();
 }
+
+} // namespace
 
 Formula& ParseFormula(std::istream& is) {
   using namespace builder;
